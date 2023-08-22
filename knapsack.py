@@ -4,12 +4,20 @@ import timeit
 
 def solve(values, target):
     subset = [(), *[None] * target]
+    below_max = 0
+    below_subset = None
     for value in values:
         for i in range(target - 1, -1, -1):
             if subset[i] is not None:
                 if i + value <= target and subset[i + value] is None:
                     subset[i + value] = (*subset[i], value)
-    return subset[target] or (), subset
+                if below_max < i + value < target:
+                    below_max = i + value
+                    below_subset = (*subset[i], value)
+    if subset[target] is not None:
+        return subset[target] or (), subset
+    else:
+        return below_subset, subset
 
 def print_array(values, subset = None, trace = None, msg ='result:'):
     if subset is not None:
@@ -51,6 +59,16 @@ class TestKnapsack(unittest.TestCase):
             ([10, 10, 10, 10, 20, 20],  40,     False,  [10, 10, 10, 10])
         ]
         self.run_test(t_values, 'Tests exact targets')
+
+    def test_lt_target(self):
+        t_values = [
+            # values                    target	sort	expected
+            # ----------------------------------------------------------------
+            ([2, 6, 3, 5],              15,     True,  [6, 5, 3]),
+            ([10, 10, 10, 20, 20],      45,     True,  [20, 20]),
+            ([10, 10, 10, 10, 20, 20],  55,     True,  [20, 20, 10]),
+        ]
+        self.run_test(t_values, 'Tests results < targets')
 
     def test_exact_long(self):
         # sorted: {1: 3, 2: 1, 3: 144, 4: 78, 5: 53, 6: 24, 7: 10, 8: 14, 10: 14, 12: 5, 15: 2, 20: 1, 21: 1}
