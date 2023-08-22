@@ -3,41 +3,24 @@ import unittest
 import timeit
 
 def solve(values, target):
-    n = len(values)
-
-    # initializes a backtracking memoization array
-    # (we could reduce the size by removing the columns < minimal value)
-    trace = [ [*[(0, 0)] * (target + 1)] for i in range(n) ] # n lines of (target+1) null elements,
-    trace.append([(i, 0) for i in range(target + 1)])        # 1 line of increasing target values
-
-    # fills the table with backtracking data to get to the result (or value < target)
-    for i in range(n - 1, -1, -1):
-        value = values[i]
-        for total in range(0, target + 1):
-            pick = 0
-            if total + value <= target:
-                pick = trace[i + 1][total + value][0]
-            leave = trace[i + 1][total][0]
-            trace[i][total] = (max(pick, leave), 1 if pick > leave else 0)
-
-    # backtracking of picked values
-    subset = []
-    total = 0
-    for (i, value) in enumerate(values):
-        if trace[i][total][1] == 1:
-            subset.append(value)
-            total += value
-    return subset, trace
+    subset = [(), *[None] * target]
+    for value in values:
+        for i in range(target - 1, -1, -1):
+            if subset[i] is not None:
+                if i + value <= target and subset[i + value] is None:
+                    subset[i + value] = (*subset[i], value)
+    return subset[target] or (), subset
 
 def print_array(values, subset = None, trace = None, msg ='result:'):
     if subset is not None:
         print(f'  {msg}', ', '.join(str(x) for x in subset))
     elif msg:
         print(msg)
+    print(f'  values: {values}')
     if trace is not None:
-        print(f'     {"  ".join(f"{i:5}" for i in range(len(trace[0])))}')
-        for (i, line) in enumerate(trace[:-1]):
-            print(f'  {values[i]:3}: {", ".join(f"{x[0]:3}:{x[1]}" for x in line)}')
+        for (i, subset) in enumerate(trace):
+            if subset is not None:
+                print(f'  {i:3}: {", ".join(str(x) for x in subset)}')
 
 class TestKnapsack(unittest.TestCase):
     def run_test(self, t_values, title='Test'):
@@ -46,7 +29,7 @@ class TestKnapsack(unittest.TestCase):
         for (i, (values, target, sort, expected)) in enumerate(t_values):
             print(f'- test #{i}: ', end='')
             if sort:
-                values = sorted(values, reverse=False)
+                values = sorted(values, reverse=True)
             subset, trace = solve(values, target)
             if sorted(subset) == sorted(expected):
                 print_array(values, subset, None)
@@ -63,9 +46,9 @@ class TestKnapsack(unittest.TestCase):
             ([2, 6, 3, 5],              10,     False,  [2, 3, 5]),
             ([2, 5, 9, 3, 4],           10,     False,  [2, 3, 5]),
             ([10, 10, 10, 20, 20],      40,     True,   [20, 20]),
-            ([10, 10, 10, 20, 20],      40,     False,  [20, 20]),
+            ([10, 10, 10, 20, 20],      40,     False,  [10, 10, 20]),
             ([10, 10, 10, 10, 20, 20],  40,     True,   [20, 20]),
-            ([10, 10, 10, 10, 20, 20],  40,     False,  [20, 20])
+            ([10, 10, 10, 10, 20, 20],  40,     False,  [10, 10, 10, 10])
         ]
         self.run_test(t_values, 'Tests exact targets')
 
@@ -79,7 +62,7 @@ class TestKnapsack(unittest.TestCase):
             # values                    target	sort	expected
             # ----------------------------------------------------------------
             (values,                    40,     True,   [10, 15, 15]),
-            (values,                    40,     False,  [3, 2, 7, 7, 7, 7, 7])
+            (values,                    40,     False,  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4])
         ]
         self.run_test(t_values, 'Tests real case')
 
