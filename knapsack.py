@@ -59,3 +59,8 @@ def solve_gt(values: list[int], target: int) -> tuple | tuple[int]:
         return subset[target]
     else:
         return above_subset
+
+
+def values_from_dict(data: dict) -> list[int]:
+    """Extracts values for a `value: quantity` dictionary"""
+    return [v for (v, nbr) in data.items() for _ in range(nbr)]

@@ -1,5 +1,5 @@
 import os, unittest, timeit
-from knapsack import solve_lt, solve_gt
+from knapsack import solve_lt, solve_gt, values_from_dict
 
 
 def print_array(subset = None, msg ='result:'):
@@ -71,9 +71,7 @@ class TestKnapsack(unittest.TestCase):
     def test_exact_long(self):
         # sorted: {1: 3, 2: 1, 3: 144, 4: 78, 5: 53, 6: 24, 7: 10, 8: 14, 10: 14, 12: 5, 15: 2, 20: 1, 21: 1}
         data = {4: 78, 10: 14, 5: 53, 1: 3, 6: 24, 12: 5, 8: 14, 15: 2, 3: 144, 2: 1, 21: 1, 20: 1, 7: 10}
-        values = []
-        for (value, num) in data.items():
-            values.extend([value]*num)
+        values = values_from_dict(data)
         t_values = [
             # values                    target	sort	expected
             # ----------------------------------------------------------------
@@ -81,6 +79,27 @@ class TestKnapsack(unittest.TestCase):
             (values,                    40,     False,  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4])
         ]
         self.run_test([solve_lt, solve_gt], t_values, 'Tests real case')
+
+    def test_iterations(self):
+        def remove_from_chest(chest: dict[int], subset: tuple[int]):
+            for value in subset:
+                chest[value] -= 1
+        data = {40: 16, 21: 1, 20: 2, 15: 2, 12: 5, 10: 18, 8: 15, 7: 11, 6: 36, 5: 57, 4: 112, 3: 102, 2: 2, 1: 1}
+        expected = [*[40]*55, *[42]*5]
+        result = []
+        it = 1
+        while True:
+            print(f'Iteration #{it}: {data}')
+            values = sorted(values_from_dict(data), reverse=True)
+            subset = solve_gt(values, 40)
+            total = sum(subset)
+            print(f'-> {total} in {subset}')
+            if len(subset) == 0:
+                break
+            result.append(total)
+            remove_from_chest(data, subset)
+            it += 1
+        self.assertEqual(result, expected)
 
     def test_timer(self):
         if os.environ.get('TIMEIT', None) is not None:

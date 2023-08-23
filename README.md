@@ -41,3 +41,14 @@ solve_lt(values, 12)
 solve_gt(values, 100)
 # result: ()
 ```
+
+A helper function extracts the values from a dictionary in which values are specified as `value`: `quantity` items:
+
+```python
+from knapsack import values_from_dict
+data = { 10: 4, 20: 2, 5: 1 }
+values_from_dict(data)
+# result: [10, 10, 10, 10, 20, 20, 5]
+```
+
+You'll find one unit test, `test_iterations`, that uses this function and iterates through a chest of supplies to get as many subsets of 40 (or more) as possible.
