@@ -142,7 +142,7 @@ class TestKnapsack(unittest.TestCase):
         if os.environ.get('TIMEIT', None) is not None:
             timeit.timeit('values = [215, 275, 335, 355, 420, 580]*3\nsolve_lt(values, 1505)',
                           number=1000,
-                          setup="from knapsack import solve")
+                          setup="from knapsack import solve_lt")
 
     def test_inspect(self):
         # values = [2, 3, 4, 5, 9]
