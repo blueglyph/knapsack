@@ -2,14 +2,18 @@ import os, sys
 import unittest
 import timeit
 
-def solve_lt(values, target):
-    """Find a subset of `values` whose sum is less than or equal to `target` and the closest possible to it.
+
+def solve_lt(values: list[int], target: int) -> tuple | tuple[int]:
+    """
+    Finds a subset of `values` whose sum is less than or equal to `target` and the closest possible to it.
     Values are taken only once.
+
+    Returns the subset, or an empty tuple if no solution is found.
 
     The data in `values` can be sorted in reverse order so that greater values are taken in priority.
     This may give better results when removing the subset and iterating; for example, when several
-    subsets are required."""
-
+    subsets are required.
+    """
     subset = [(), *[None] * target]         # initialized to [(), None, ..., None]
     below_max = 0
     below_subset = ()
@@ -28,14 +32,18 @@ def solve_lt(values, target):
     else:
         return below_subset
 
-def solve_gt(values, target):
-    """Find a subset of `values` whose sum is greater than or equal to `target` and the closest possible to it.
+
+def solve_gt(values: list[int], target: int) -> tuple | tuple[int]:
+    """
+    Finds a subset of `values` whose sum is greater than or equal to `target` and the closest possible to it.
     Values are taken only once.
+
+    Returns the subset, or an empty tuple if no solution is found.
 
     The data in `values` can be sorted in reverse order so that greater values are taken in priority.
     This may give better results when removing the subset and iterating; for example, when several
-    subsets are required."""
-
+    subsets are required.
+    """
     subset = [(), *[None] * target]         # initialized to [(), None, ..., None]
     above_min = sys.maxsize                 # initialized to INFINITY / MAXINT
     above_subset = ()
@@ -54,11 +62,13 @@ def solve_gt(values, target):
     else:
         return above_subset
 
+
 def print_array(values, subset = None, msg ='result:'):
     if subset is not None:
         print(f'  {msg}', ', '.join(str(x) for x in subset))
     elif msg:
         print(msg)
+
 
 class TestKnapsack(unittest.TestCase):
     def run_test(self, algorithms, t_values, title='Test'):
@@ -144,6 +154,7 @@ class TestKnapsack(unittest.TestCase):
         values = [1, 2, 3, 5, 11]
         subset = solve_lt(values, 10)
         print_array(values, subset)
+
 
 if __name__ == '__main__':
     unittest.main()
