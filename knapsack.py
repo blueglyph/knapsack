@@ -3,36 +3,54 @@ import unittest
 import timeit
 
 def solve_lt(values, target):
-    subset = [(), *[None] * target]
+    """Find a subset of `values` whose sum is less than or equal to `target` and the closest possible to it.
+    Values are taken only once.
+
+    The data in `values` can be sorted in reverse order so that greater values are taken in priority.
+    This may give better results when removing the subset and iterating; for example, when several
+    subsets are required."""
+
+    subset = [(), *[None] * target]         # initialized to [(), None, ..., None]
     below_max = 0
     below_subset = None
     for value in values:
-        for i in range(target - 1, -1, -1):
+        for i in range(target - 1, -1, -1): # target-1 down to 0
             if subset[i] is not None:
+                # builds the subset to get to i+value
                 if i + value <= target and subset[i + value] is None:
                     subset[i + value] = (*subset[i], value)
+                # keeps a potential best candidate in case the target cannot be reached
                 if below_max < i + value < target:
                     below_max = i + value
                     below_subset = (*subset[i], value)
     if subset[target] is not None:
-        return subset[target] or (), subset
+        return subset[target], subset
     else:
         return below_subset, subset
 
 def solve_gt(values, target):
-    subset = [(), *[None] * target]
-    above_min = sys.maxsize # INFINITY / MAXINT
+    """Find a subset of `values` whose sum is greater than or equal to `target` and the closest possible to it.
+    Values are taken only once.
+
+    The data in `values` can be sorted in reverse order so that greater values are taken in priority.
+    This may give better results when removing the subset and iterating; for example, when several
+    subsets are required."""
+
+    subset = [(), *[None] * target]         # initialized to [(), None, ..., None]
+    above_min = sys.maxsize                 # initialized to INFINITY / MAXINT
     above_subset = 0
     for value in values:
-        for i in range(target - 1, -1, -1):
+        for i in range(target - 1, -1, -1): # target-1 down to 0
             if subset[i] is not None:
+                # builds the subset to get to i+value
                 if i + value <= target and subset[i + value] is None:
                     subset[i + value] = (*subset[i], value)
+                # keeps a potential best candidate in case the target cannot be reached
                 if target < i + value < above_min:
                     above_min = i + value
                     above_subset = (*subset[i], value)
     if subset[target] is not None:
-        return subset[target] or (), subset
+        return subset[target], subset
     else:
         return above_subset, subset
 
@@ -41,7 +59,6 @@ def print_array(values, subset = None, trace = None, msg ='result:'):
         print(f'  {msg}', ', '.join(str(x) for x in subset))
     elif msg:
         print(msg)
-    print(f'  values: {values}')
     if trace is not None:
         for (i, subset) in enumerate(trace):
             if subset is not None:
@@ -85,11 +102,22 @@ class TestKnapsack(unittest.TestCase):
         t_values = [
             # values                    target	sort	expected
             # ----------------------------------------------------------------
-            ([2, 6, 3, 5],              15,     True,  [6, 5, 3]),
-            ([10, 10, 10, 20, 20],      45,     True,  [20, 20]),
-            ([10, 10, 10, 10, 20, 20],  55,     True,  [20, 20, 10]),
+            ([2, 6, 3, 5],              15,     True,   [6, 5, 3]),
+            ([10, 10, 10, 20, 20],      45,     True,   [20, 20]),
+            ([10, 10, 10, 10, 20, 20],  55,     True,   [20, 20, 10]),
         ]
         self.run_test([solve_lt], t_values, 'Tests results < targets')
+
+    # expected to fail for now
+    def test_gt_target(self):
+        t_values = [
+            # values                    target	sort	expected
+            # ----------------------------------------------------------------
+            ([2, 5, 6, 7],              10, 	True,   [6, 5]),
+            ([10, 10, 10, 20, 20],      45,     True,   [20, 20, 10]),
+            ([10, 10, 10, 10, 20, 20],  55,     True,   [20, 20, 10, 10]),
+        ]
+        self.run_test([solve_gt], t_values, 'Tests results > targets')
 
     def test_exact_long(self):
         # sorted: {1: 3, 2: 1, 3: 144, 4: 78, 5: 53, 6: 24, 7: 10, 8: 14, 10: 14, 12: 5, 15: 2, 20: 1, 21: 1}
@@ -104,15 +132,6 @@ class TestKnapsack(unittest.TestCase):
             (values,                    40,     False,  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4])
         ]
         self.run_test([solve_lt, solve_gt], t_values, 'Tests real case')
-
-    # expected to fail for now
-    def test_gt_target(self):
-        t_values = [
-            # values                    target	sort	expected
-            # ----------------------------------------------------------------
-            ([2, 5, 6, 7],              10, 	False, 	[5, 6]),
-        ]
-        self.run_test([solve_gt], t_values, 'Tests results > targets')
 
     def test_timer(self):
         if os.environ.get('TIMEIT', None) is not None:
