@@ -12,7 +12,7 @@ def solve_lt(values, target):
 
     subset = [(), *[None] * target]         # initialized to [(), None, ..., None]
     below_max = 0
-    below_subset = None
+    below_subset = ()
     for value in values:
         for i in range(target - 1, -1, -1): # target-1 down to 0
             if subset[i] is not None:
@@ -38,7 +38,7 @@ def solve_gt(values, target):
 
     subset = [(), *[None] * target]         # initialized to [(), None, ..., None]
     above_min = sys.maxsize                 # initialized to INFINITY / MAXINT
-    above_subset = 0
+    above_subset = ()
     for value in values:
         for i in range(target - 1, -1, -1): # target-1 down to 0
             if subset[i] is not None:
@@ -76,6 +76,7 @@ class TestKnapsack(unittest.TestCase):
                 if sort:
                     values = sorted(values, reverse=True)
                 subset, trace = solve(values, target)
+                print(f'-> {subset}')
                 if sorted(subset) == sorted(expected):
                     print_array(values, subset, None)
                 else:
@@ -105,6 +106,8 @@ class TestKnapsack(unittest.TestCase):
             ([2, 6, 3, 5],              15,     True,   [6, 5, 3]),
             ([10, 10, 10, 20, 20],      45,     True,   [20, 20]),
             ([10, 10, 10, 10, 20, 20],  55,     True,   [20, 20, 10]),
+            ([20, 30],                  10,     True,   []),
+            ([1, 2],                    10,     True,   [2, 1])
         ]
         self.run_test([solve_lt], t_values, 'Tests results < targets')
 
@@ -116,6 +119,8 @@ class TestKnapsack(unittest.TestCase):
             ([2, 5, 6, 7],              10, 	True,   [6, 5]),
             ([10, 10, 10, 20, 20],      45,     True,   [20, 20, 10]),
             ([10, 10, 10, 10, 20, 20],  55,     True,   [20, 20, 10, 10]),
+            ([20, 30],                  10,     True,   [20]),
+            ([1, 2],                    10,     True,   [])
         ]
         self.run_test([solve_gt], t_values, 'Tests results > targets')
 
