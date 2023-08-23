@@ -1,5 +1,5 @@
 import os, unittest, timeit
-from knapsack import solve_lt, solve_gt, values_from_dict
+from knapsack import solve_le, solve_ge, values_from_dict
 
 
 def print_array(subset = None, msg ='result:'):
@@ -41,7 +41,7 @@ class TestKnapsack(unittest.TestCase):
             ([10, 10, 10, 10, 20, 20],  40,     False,  [10, 10, 10, 10])
         ]
 
-        self.run_test([solve_lt, solve_gt], t_values, 'Tests exact targets')
+        self.run_test([solve_le, solve_ge], t_values, 'Tests exact targets')
 
     def test_lt_target(self):
         t_values = [
@@ -53,7 +53,7 @@ class TestKnapsack(unittest.TestCase):
             ([20, 30],                  10,     True,   []),
             ([1, 2],                    10,     True,   [2, 1])
         ]
-        self.run_test([solve_lt], t_values, 'Tests results < targets')
+        self.run_test([solve_le], t_values, 'Tests results < targets')
 
     # expected to fail for now
     def test_gt_target(self):
@@ -66,7 +66,7 @@ class TestKnapsack(unittest.TestCase):
             ([20, 30],                  10,     True,   [20]),
             ([1, 2],                    10,     True,   [])
         ]
-        self.run_test([solve_gt], t_values, 'Tests results > targets')
+        self.run_test([solve_ge], t_values, 'Tests results > targets')
 
     def test_exact_long(self):
         # sorted: {1: 3, 2: 1, 3: 144, 4: 78, 5: 53, 6: 24, 7: 10, 8: 14, 10: 14, 12: 5, 15: 2, 20: 1, 21: 1}
@@ -78,7 +78,7 @@ class TestKnapsack(unittest.TestCase):
             (values,                    40,     True,   [10, 15, 15]),
             (values,                    40,     False,  [4, 4, 4, 4, 4, 4, 4, 4, 4, 4])
         ]
-        self.run_test([solve_lt, solve_gt], t_values, 'Tests real case')
+        self.run_test([solve_le, solve_ge], t_values, 'Tests real case')
 
     def test_iterations(self):
         def remove_from_chest(chest: dict[int], subset: tuple[int]):
@@ -91,7 +91,7 @@ class TestKnapsack(unittest.TestCase):
         while True:
             print(f'Iteration #{it}: {data}')
             values = sorted(values_from_dict(data), reverse=True)
-            subset = solve_gt(values, 40)
+            subset = solve_ge(values, 40)
             total = sum(subset)
             print(f'-> {total} in {subset}')
             if len(subset) == 0:
@@ -103,14 +103,14 @@ class TestKnapsack(unittest.TestCase):
 
     def test_timer(self):
         if os.environ.get('TIMEIT', None) is not None:
-            timeit.timeit('values = [215, 275, 335, 355, 420, 580]*3\nsolve_lt(values, 1505)',
+            timeit.timeit('values = [215, 275, 335, 355, 420, 580]*3\nsolve_le(values, 1505)',
                           number=1000,
-                          setup="from knapsack import solve_lt")
+                          setup="from knapsack import solve_le")
 
     def test_inspect(self):
         # values = [2, 3, 4, 5, 9]
         values = [1, 2, 3, 5, 11]
-        subset = solve_lt(values, 10)
+        subset = solve_le(values, 10)
         print_array(subset)
 
 

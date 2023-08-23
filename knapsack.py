@@ -1,7 +1,7 @@
 import sys
 
 
-def solve_lt(values: list[int], target: int) -> tuple | tuple[int]:
+def solve_le(values: list[int], target: int) -> tuple | tuple[int]:
     """
     Finds a subset of `values` whose sum is less than or equal to `target` and the closest possible to it.
     Values are taken only once.
@@ -31,7 +31,7 @@ def solve_lt(values: list[int], target: int) -> tuple | tuple[int]:
         return below_subset
 
 
-def solve_gt(values: list[int], target: int) -> tuple | tuple[int]:
+def solve_ge(values: list[int], target: int) -> tuple | tuple[int]:
     """
     Finds a subset of `values` whose sum is greater than or equal to `target` and the closest possible to it.
     Values are taken only once.

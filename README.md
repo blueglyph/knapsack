@@ -11,7 +11,7 @@ The general idea is to start from the target value and gather subsets of values 
 ## Examples
 
 ```python
-from knapsack import solve_gt, solve_lt
+from knapsack import solve_ge, solve_le
 values = [2, 6, 3, 5]
 
 # Sorting the values takes the smallest / greatest values first.
@@ -20,25 +20,25 @@ values = [2, 6, 3, 5]
 # multiple subsets.
 values.sort(reverse=True)
 
-# Both solve_gt and solve_lt find the values that sum up to the exact target
+# Both solve_ge and solve_le find the values that sum up to the exact target
 # when it's possible:
-solve_gt(values, 10)
+solve_ge(values, 10)
 # result: (5, 3, 2)
-solve_lt(values, 10)
+solve_le(values, 10)
 # result: (5, 3, 2)
 
-# When it's not possible to reach the target, solve_gt will try to find the
+# When it's not possible to reach the target, solve_ge will try to find the
 # minimum sum above it:
-solve_gt(values, 12)
+solve_ge(values, 12)
 # result: (6, 5, 2)
 
-# Similarly, solve_lt will try to find the maximum sum below it:
-solve_lt(values, 12)
+# Similarly, solve_le will try to find the maximum sum below it:
+solve_le(values, 12)
 # result: (6, 5)
 
 # When it's not possible to find a solution even below or above the target,
 # an empty subset is returned:
-solve_gt(values, 100)
+solve_ge(values, 100)
 # result: ()
 ```
 
@@ -206,7 +206,7 @@ From the loops, the complexity remains O(n * target), but the space is reduced i
 Storing all the values beyond the target would be inefficient and incompatible with the algorithm. In case there is no exact solution, we keep track of the best next thing, which is the minimum total greater than the target. It's a simple modification to the previous algorithm:
 
 ```python
-def solve_gt(values: list[int], target: int) -> tuple | tuple[int]:
+def solve_ge(values: list[int], target: int) -> tuple | tuple[int]:
     subset = [(), *[None] * target] # initialized to [(), None, ..., None]
     above_min = sys.maxsize         # MAXINT
     above_subset = ()
