@@ -1,7 +1,8 @@
 import os, unittest, timeit
 from knapsack import solve_lt, solve_gt
 
-def print_array(values, subset = None, msg ='result:'):
+
+def print_array(subset = None, msg ='result:'):
     if subset is not None:
         print(f'  {msg}', ', '.join(str(x) for x in subset))
     elif msg:
@@ -21,11 +22,11 @@ class TestKnapsack(unittest.TestCase):
                     values = sorted(values, reverse=True)
                 subset = solve(values, target)
                 if sorted(subset) == sorted(expected):
-                    print_array(values, subset)
+                    print_array(subset)
                 else:
                     n_err += 1
                     print('  ERROR, expected:', ", ".join(str(x) for x in expected))
-                    print_array(values, subset)
+                    print_array(subset)
         self.assertTrue(n_err == 0)
 
     def test_exact_target(self):
@@ -91,7 +92,7 @@ class TestKnapsack(unittest.TestCase):
         # values = [2, 3, 4, 5, 9]
         values = [1, 2, 3, 5, 11]
         subset = solve_lt(values, 10)
-        print_array(values, subset)
+        print_array(subset)
 
 
 if __name__ == '__main__':

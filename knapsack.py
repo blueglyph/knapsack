@@ -1,6 +1,4 @@
-import os, sys
-import unittest
-import timeit
+import sys
 
 
 def solve_lt(values: list[int], target: int) -> tuple | tuple[int]:
