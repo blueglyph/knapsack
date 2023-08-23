@@ -24,9 +24,9 @@ def solve_lt(values, target):
                     below_max = i + value
                     below_subset = (*subset[i], value)
     if subset[target] is not None:
-        return subset[target], subset
+        return subset[target]
     else:
-        return below_subset, subset
+        return below_subset
 
 def solve_gt(values, target):
     """Find a subset of `values` whose sum is greater than or equal to `target` and the closest possible to it.
@@ -50,19 +50,15 @@ def solve_gt(values, target):
                     above_min = i + value
                     above_subset = (*subset[i], value)
     if subset[target] is not None:
-        return subset[target], subset
+        return subset[target]
     else:
-        return above_subset, subset
+        return above_subset
 
-def print_array(values, subset = None, trace = None, msg ='result:'):
+def print_array(values, subset = None, msg ='result:'):
     if subset is not None:
         print(f'  {msg}', ', '.join(str(x) for x in subset))
     elif msg:
         print(msg)
-    if trace is not None:
-        for (i, subset) in enumerate(trace):
-            if subset is not None:
-                print(f'  {i:3}: {", ".join(str(x) for x in subset)}')
 
 class TestKnapsack(unittest.TestCase):
     def run_test(self, algorithms, t_values, title='Test'):
@@ -75,14 +71,13 @@ class TestKnapsack(unittest.TestCase):
                 print(f'- test #{i}: ', end='')
                 if sort:
                     values = sorted(values, reverse=True)
-                subset, trace = solve(values, target)
-                print(f'-> {subset}')
+                subset = solve(values, target)
                 if sorted(subset) == sorted(expected):
-                    print_array(values, subset, None)
+                    print_array(values, subset)
                 else:
                     n_err += 1
                     print('  ERROR, expected:', ", ".join(str(x) for x in expected))
-                    print_array(values, subset, trace)
+                    print_array(values, subset)
         self.assertTrue(n_err == 0)
 
     def test_exact_target(self):
@@ -147,8 +142,8 @@ class TestKnapsack(unittest.TestCase):
     def test_inspect(self):
         # values = [2, 3, 4, 5, 9]
         values = [1, 2, 3, 5, 11]
-        subset, trace = solve_lt(values, 10)
-        print_array(values, subset, trace)
+        subset = solve_lt(values, 10)
+        print_array(values, subset)
 
 if __name__ == '__main__':
     unittest.main()
